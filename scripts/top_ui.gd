@@ -26,6 +26,8 @@ func set_mode_timed() -> void:
 		counter_label.text = "0" 
 		
 func _ready() -> void:
-	set_score(0)       
-	set_mode_moves()    
-	set_moves(15)       
+	# set_score(0)       
+	# set_mode_moves()    
+	# set_moves(15)    
+	pass
+	   
