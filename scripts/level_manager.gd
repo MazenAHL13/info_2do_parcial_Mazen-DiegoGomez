@@ -7,7 +7,7 @@ var level_type: int = LevelType.MOVES
 var running: bool = false
 
 var current_score: int = 0
-var target_score: int = 0
+var target_score: int = 100
 var remaining_moves: int = 0
 var remaining_time: int = 0
 
@@ -22,7 +22,6 @@ func _ready() -> void:
 	timer.one_shot = false
 	timer.timeout.connect(_on_timer_tick)
 
-	# 🔹 conectar señales del grid
 	if grid:
 		if grid.has_signal("swap_started"):
 			grid.swap_started.connect(_on_grid_swap_started)
@@ -31,8 +30,7 @@ func _ready() -> void:
 	else:
 		print("⚠️ LevelManager no encontró el nodo grid")
 
-	# 🔹 iniciar prueba en modo MOVES
-	start_moves_level(500, 5)
+	start_moves_level(100, 5)
 	
 
 func start_moves_level(target: int, moves: int) -> void:
@@ -65,6 +63,12 @@ func start_timed_level(target: int, seconds: int) -> void:
 
 	timer.start()  
 
+	if remaining_time <= 0:
+		timer.stop()
+		running = false
+		if grid and grid.has_method("game_over"):
+			grid.game_over() 
+			
 func _on_timer_tick() -> void:
 	if not running: return
 	if level_type != LevelType.TIMED: return
@@ -76,6 +80,9 @@ func _on_timer_tick() -> void:
 	if remaining_time <= 0:
 		timer.stop()
 		running = false
+		if grid and grid.has_method("game_over"):
+			grid.game_over()
+		print("Game Over") 
 		
 func _on_grid_swap_started() -> void:
 	if not running: 
@@ -84,6 +91,11 @@ func _on_grid_swap_started() -> void:
 		remaining_moves -= 1
 		if hud: 
 			hud.set_moves(remaining_moves)
+		if remaining_moves <= 0:
+			running = false
+			if grid and grid.has_method("game_over"):
+				grid.game_over()
+			print("Game Over")
 
 
 func _on_grid_match_resolved(points: int, cascade: int) -> void:
@@ -92,5 +104,10 @@ func _on_grid_match_resolved(points: int, cascade: int) -> void:
 	current_score += points
 	if hud: 
 		hud.set_score(current_score)
+	if current_score >= target_score and running:
+		running = false
+		if grid and grid.has_method("game_over"):
+			grid.game_over()
+		print("You Win")
 		
 		

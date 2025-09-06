@@ -291,4 +291,4 @@ func _on_refill_timer_timeout():
 	
 func game_over():
 	state = WAIT
-	print("game over")
+	print("[GRID] game_over → frozen")
