@@ -11,15 +11,29 @@ var target_score: int = 0
 var remaining_moves: int = 0
 var remaining_time: int = 0
 
+@onready var grid  = $"../grid" 
 @onready var hud  = $"../top_ui"
 @onready var timer := Timer.new()
 
 func _ready() -> void:
+	# preparar timer para niveles TIMED
 	add_child(timer)
 	timer.wait_time = 1.0
 	timer.one_shot = false
 	timer.timeout.connect(_on_timer_tick)
-	start_timed_level(1500, 30)
+
+	# 🔹 conectar señales del grid
+	if grid:
+		if grid.has_signal("swap_started"):
+			grid.swap_started.connect(_on_grid_swap_started)
+		if grid.has_signal("match_resolved"):
+			grid.match_resolved.connect(_on_grid_match_resolved)
+	else:
+		print("⚠️ LevelManager no encontró el nodo grid")
+
+	# 🔹 iniciar prueba en modo MOVES
+	start_moves_level(500, 5)
+	
 
 func start_moves_level(target: int, moves: int) -> void:
 	level_type = LevelType.MOVES
@@ -62,4 +76,21 @@ func _on_timer_tick() -> void:
 	if remaining_time <= 0:
 		timer.stop()
 		running = false
+		
+func _on_grid_swap_started() -> void:
+	if not running: 
+		return
+	if level_type == LevelType.MOVES:
+		remaining_moves -= 1
+		if hud: 
+			hud.set_moves(remaining_moves)
+
+
+func _on_grid_match_resolved(points: int, cascade: int) -> void:
+	if not running: 
+		return
+	current_score += points
+	if hud: 
+		hud.set_score(current_score)
+		
 		
