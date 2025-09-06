@@ -4,6 +4,9 @@ extends Node2D
 enum {WAIT, MOVE}
 var state
 
+
+
+
 # grid
 @export var width: int
 @export var height: int
@@ -37,10 +40,13 @@ var final_touch = Vector2.ZERO
 var is_controlling = false
 
 # scoring variables and signals
-
+const BASE_PIECE_POINTS: int = 10
+var current_cascade_index: int = 0
+var last_destroyed_count: int = 0
 
 # counter variables and signals
-
+signal swap_started()                                           
+signal match_resolved(points: int, cascade: int)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -128,6 +134,9 @@ func swap_pieces(column, row, direction: Vector2):
 	#other_piece.position = grid_to_pixel(column, row)
 	first_piece.move(grid_to_pixel(column + direction.x, row + direction.y))
 	other_piece.move(grid_to_pixel(column, row))
+	
+	emit_signal("swap_started")
+	
 	if not move_checked:
 		find_matches()
 
@@ -199,13 +208,16 @@ func find_matches():
 	
 func destroy_matched():
 	var was_matched = false
+	var destroyed_this_pass := 0
 	for i in width:
 		for j in height:
 			if all_pieces[i][j] != null and all_pieces[i][j].matched:
 				was_matched = true
+				destroyed_this_pass += 1
 				all_pieces[i][j].queue_free()
 				all_pieces[i][j] = null
-				
+	
+	last_destroyed_count = destroyed_this_pass			
 	move_checked = true
 	if was_matched:
 		get_parent().get_node("collapse_timer").start()
@@ -254,16 +266,21 @@ func check_after_refill():
 	for i in width:
 		for j in height:
 			if all_pieces[i][j] != null and match_at(i, j, all_pieces[i][j].color):
+				current_cascade_index += 1  
 				find_matches()
 				get_parent().get_node("destroy_timer").start()
 				return
+	current_cascade_index = 0 
 	state = MOVE
-	
 	move_checked = false
 
 func _on_destroy_timer_timeout():
 	print("destroy")
 	destroy_matched()
+	
+	if last_destroyed_count > 0:
+		var points := last_destroyed_count * BASE_PIECE_POINTS
+		emit_signal("match_resolved", points, current_cascade_index)
 
 func _on_collapse_timer_timeout():
 	print("collapse")
@@ -274,4 +291,4 @@ func _on_refill_timer_timeout():
 	
 func game_over():
 	state = WAIT
-	print("game over")
+	print("[GRID] game_over → frozen")
