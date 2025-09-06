@@ -1,5 +1,4 @@
 extends Node
-# scripts/level_manager.gd
 
 enum LevelType { MOVES, TIMED }
 
@@ -7,16 +6,18 @@ var level_type: int = LevelType.MOVES
 var running: bool = false
 
 var current_score: int = 0
-var target_score: int = 100
+var target_score: int = 0
 var remaining_moves: int = 0
 var remaining_time: int = 0
 
-@onready var grid  = $"../grid" 
+@onready var grid  = $"../grid"
 @onready var hud  = $"../top_ui"
 @onready var timer := Timer.new()
+@onready var result_banner := $"../top_ui/ResultBanner"
 
 func _ready() -> void:
-	# preparar timer para niveles TIMED
+	result_banner.hide()
+
 	add_child(timer)
 	timer.wait_time = 1.0
 	timer.one_shot = false
@@ -28,10 +29,10 @@ func _ready() -> void:
 		if grid.has_signal("match_resolved"):
 			grid.match_resolved.connect(_on_grid_match_resolved)
 	else:
-		print("⚠️ LevelManager no encontró el nodo grid")
+		print("error")
 
 	start_moves_level(100, 5)
-	
+
 
 func start_moves_level(target: int, moves: int) -> void:
 	level_type = LevelType.MOVES
@@ -46,7 +47,7 @@ func start_moves_level(target: int, moves: int) -> void:
 		hud.set_score(current_score)
 		hud.set_moves(remaining_moves)
 
-	timer.stop() 
+	timer.stop()
 
 func start_timed_level(target: int, seconds: int) -> void:
 	level_type = LevelType.TIMED
@@ -61,14 +62,14 @@ func start_timed_level(target: int, seconds: int) -> void:
 		hud.set_score(current_score)
 		hud.set_time(remaining_time)
 
-	timer.start()  
+	timer.start()
 
 	if remaining_time <= 0:
 		timer.stop()
 		running = false
 		if grid and grid.has_method("game_over"):
-			grid.game_over() 
-			
+			grid.game_over()
+
 func _on_timer_tick() -> void:
 	if not running: return
 	if level_type != LevelType.TIMED: return
@@ -82,32 +83,40 @@ func _on_timer_tick() -> void:
 		running = false
 		if grid and grid.has_method("game_over"):
 			grid.game_over()
-		print("Game Over") 
-		
+		print("Game Over")
+		# BANNER: sólo cuando termina el tiempo
+		if hud and hud.has_method("show_result_banner"):
+			hud.show_result_banner("YOU LOSE")
+
 func _on_grid_swap_started() -> void:
-	if not running: 
+	if not running:
 		return
 	if level_type == LevelType.MOVES:
 		remaining_moves -= 1
-		if hud: 
+		if hud:
 			hud.set_moves(remaining_moves)
+
 		if remaining_moves <= 0:
 			running = false
 			if grid and grid.has_method("game_over"):
 				grid.game_over()
 			print("Game Over")
-
+			if hud and hud.has_method("show_result_banner"):
+				if current_score >= target_score:
+					hud.show_result_banner("YOU WIN")
+				else:
+					hud.show_result_banner("YOU LOSE")
 
 func _on_grid_match_resolved(points: int, cascade: int) -> void:
-	if not running: 
+	if not running:
 		return
 	current_score += points
-	if hud: 
+	if hud:
 		hud.set_score(current_score)
 	if current_score >= target_score and running:
 		running = false
 		if grid and grid.has_method("game_over"):
 			grid.game_over()
 		print("You Win")
-		
-		
+		if hud and hud.has_method("show_result_banner"):
+			hud.show_result_banner("YOU WIN")
