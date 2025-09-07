@@ -86,7 +86,7 @@ func _on_timer_tick() -> void:
 		print("Game Over")
 		# BANNER: sólo cuando termina el tiempo
 		if hud and hud.has_method("show_result_banner"):
-			hud.show_result_banner("YOU LOSE")
+			hud.show_result_banner("💔YOU LOSE💔")
 
 func _on_grid_swap_started() -> void:
 	if not running:
@@ -103,9 +103,9 @@ func _on_grid_swap_started() -> void:
 			print("Game Over")
 			if hud and hud.has_method("show_result_banner"):
 				if current_score >= target_score:
-					hud.show_result_banner("YOU WIN")
+					hud.show_result_banner("🎉YOU WIN🎉")
 				else:
-					hud.show_result_banner("YOU LOSE")
+					hud.show_result_banner("💔YOU LOSE💔")
 
 func _on_grid_match_resolved(points: int, cascade: int) -> void:
 	if not running:
@@ -119,4 +119,4 @@ func _on_grid_match_resolved(points: int, cascade: int) -> void:
 			grid.game_over()
 		print("You Win")
 		if hud and hud.has_method("show_result_banner"):
-			hud.show_result_banner("YOU WIN")
+			hud.show_result_banner("🎉YOU WIN🎉")
