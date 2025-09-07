@@ -2,21 +2,24 @@ extends Node
 
 enum LevelType { MOVES, TIMED }
 
-var level_type: int = LevelType.MOVES
-var running: bool = false
+@export var level_type: LevelType = LevelType.MOVES
+@export var target_score: int = 500
+@export var level_moves: int = 15
+@export var level_time: int = 30
 
+var running: bool = false
 var current_score: int = 0
-var target_score: int = 0
 var remaining_moves: int = 0
 var remaining_time: int = 0
 
-@onready var grid  = $"../grid"
-@onready var hud  = $"../top_ui"
+@onready var grid  = $"grid"
+@onready var hud  = $"top_ui"
 @onready var timer := Timer.new()
-@onready var result_banner := $"../top_ui/ResultBanner"
+@onready var result_banner := $"top_ui/ResultBanner"
 
 func _ready() -> void:
-	result_banner.hide()
+	if result_banner:
+		result_banner.hide()
 
 	add_child(timer)
 	timer.wait_time = 1.0
@@ -30,8 +33,10 @@ func _ready() -> void:
 			grid.match_resolved.connect(_on_grid_match_resolved)
 	else:
 		print("error")
-
-	start_moves_level(100, 5)
+	if level_type == LevelType.MOVES:
+		start_moves_level(target_score, level_moves)
+	else:
+		start_timed_level(target_score, level_time)
 
 
 func start_moves_level(target: int, moves: int) -> void:
