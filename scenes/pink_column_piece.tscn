@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://cahw7n4mel7gh"]
+
+[ext_resource type="Script" path="res://scripts/piece.gd" id="1_wicyo"]
+[ext_resource type="Texture2D" uid="uid://o60ibguctnm4" path="res://assets/pieces/Pink Column.png" id="2_ytxp5"]
+
+[node name="ColumnPiece" type="Node2D"]
+script = ExtResource("1_wicyo")
+piece_type = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_ytxp5")
