@@ -5,8 +5,6 @@ extends TextureRect
 @onready var result_banner = $ResultBanner
 @onready var result_label = $ResultBanner/result_label
 
-# top_ui.gd
-
 func set_score(n: int) -> void:
 	if score_label:
 		score_label.text = str(n)
@@ -21,11 +19,11 @@ func set_time(seconds: int) -> void:
 
 func set_mode_moves() -> void:
 	if counter_label:
-		counter_label.text = "0"  
-		
+		counter_label.text = "0"
+
 func set_mode_timed() -> void:
 	if counter_label:
-		counter_label.text = "0" 
+		counter_label.text = "0"
 
 func show_result_banner(text: String) -> void:
 	if result_label:

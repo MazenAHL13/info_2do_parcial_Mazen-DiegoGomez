@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bbnrr2ix3vtdf"]
+
+[ext_resource type="Script" path="res://scripts/piece.gd" id="1_iynlm"]
+[ext_resource type="Texture2D" uid="uid://d1ucglmj14llv" path="res://assets/pieces/Rainbow.png" id="2_wy7jr"]
+
+[node name="RainbowPiece" type="Node2D"]
+script = ExtResource("1_iynlm")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_wy7jr")

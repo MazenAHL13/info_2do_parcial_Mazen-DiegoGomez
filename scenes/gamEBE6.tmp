@@ -23,6 +23,12 @@ texture = ExtResource("3_jy0d4")
 
 [node name="grid" type="Node2D" parent="."]
 script = ExtResource("4_4jr62")
+width = null
+height = null
+x_start = null
+y_start = null
+offset = null
+y_offset = null
 
 [node name="destroy_timer" type="Timer" parent="."]
 wait_time = 0.5
